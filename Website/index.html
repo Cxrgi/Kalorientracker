@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Kalorientracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Kalorientracker</h1>
+        <h2>Tracke ganz einfach deine Kalorien</h2>
+    </header>
+
+    <main>
+        <label for="kalorienziel">Kalorienziel eingeben: </label>
+        <input id="kalorienziel" type="number" placeholder="z.B. 2500" />
+        <input id="submitBtn" type="submit" value="als Ziel setzen">
+
+        <p id="outputText"></p>
+
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <p id="warnText"></p>
+
+
+        <div id="macroBarContainer">
+            <div id="macroBar">
+                <div class="macro-segment fat" title="Fett"></div>
+                <div class="macro-segment protein" title="Protein"></div>
+                <div class="macro-segment carbs" title="Kohlenhydrate"></div>
+                <div class="macro-segment kcal" title="Kalorien"></div>
+            </div>
+        </div>
+        <p id="macroInfoText"></p>
+
+        <script>
+            let kalorienziel = ""
+            let kalorienRN = 0
+            let currentDate = new Date()
+            let selectedDate = new Date(currentDate)
+
+            const inputField = document.getElementById("kalorienziel")
+            const submitButton = document.getElementById("submitBtn")
+            const outputText = document.getElementById("outputText")
+
+            function pad(n) {
+                return String(n).padStart(2, "0")
+            }
+
+            function getDateKey(date) {
+                const y = date.getFullYear()
+                const m = pad(date.getMonth() + 1)
+                const d = pad(date.getDate())
+                return `${y}-${m}-${d}`
+            }
+
+            function formatDisplayDate(date) {
+                const days = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."]
+                const dayName = days[date.getDay()]
+                const d = String(date.getDate()).padStart(2, "0")
+                const m = String(date.getMonth() + 1).padStart(2, "0")
+                const y = String(date.getFullYear()).slice(2)
+                return `${dayName} ${d}.${m}.${y}`
+            }
+
+            if (localStorage.getItem("kalorienziel")) {
+                kalorienziel = parseInt(localStorage.getItem("kalorienziel"))
+            }
+
+            if (localStorage.getItem("kalorienRN")) {
+                kalorienRN = parseInt(localStorage.getItem("kalorienRN"))
+            }
+
+            inputField.addEventListener("keydown", function (e) {
+                if (e.key === "e" || e.key === "E" || e.key === "+" || e.key === "-") {
+                    e.preventDefault()
+                }
+            })
+
+            inputField.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    submitButton.click()
+                }
+            })
+
+            function updateOutput() {
+                let prozent = 0
+                if (kalorienziel > 0) {
+                    prozent = Math.min(100, Math.round((kalorienRN / kalorienziel) * 100))
+                }
+
+                let warnText = ""
+                if (kalorienRN >= kalorienziel && kalorienRN <= kalorienziel + 100) {
+                    warnText = "✅ Du hast dein heutiges Kalorienziel erreicht!"
+                }
+
+                if (kalorienRN > kalorienziel + 100) {
+                    const diff = kalorienRN - kalorienziel
+                    warnText = `🚨 Du hast dein heutiges Kalorienziel um ${diff} Kalorien überschritten!`
+                }
+
+                outputText.textContent = `Kalorien: ${kalorienRN} von ${kalorienziel} kcal | ${prozent}%`
+
+                const progressBar = document.getElementById("progressBar")
+                progressBar.style.width = prozent + "%"
+
+                if (prozent <= 33) {
+                    progressBar.style.background = "linear-gradient(to right, #ff4d4d, #ff944d)"
+                } else if (prozent <= 66) {
+                    progressBar.style.background = "linear-gradient(to right, #ff944d, #ffd24d)"
+                } else {
+                    progressBar.style.background = "linear-gradient(to right, #ffd24d, #4dff4d)"
+                }
+
+                const warnTextElem = document.getElementById("warnText")
+                warnTextElem.textContent = warnText
+
+                localStorage.setItem("kalorienziel", kalorienziel)
+                localStorage.setItem("kalorienRN", kalorienRN)
+
+                updateMacroBar();
+            }
+
+            function updateMacroBar() {
+                const entries = entryList.querySelectorAll("p");
+                let totalFat = 0, totalProtein = 0, totalCarbs = 0, totalKcal = 0;
+
+                entries.forEach(p => {
+                    const fat = parseFloat(p.dataset.fat) || 0;
+                    const protein = parseFloat(p.dataset.protein) || 0;
+                    const carbs = parseFloat(p.dataset.carbs) || 0;
+                    const kcalMatch = p.textContent.match(/Kalorien: (\d+)/);
+                    const kcal = kcalMatch ? parseInt(kcalMatch[1]) : 0;
+
+                    totalFat += fat;
+                    totalProtein += protein;
+                    totalCarbs += carbs;
+                    totalKcal += kcal;
+                });
+
+                const total = totalFat + totalProtein + totalCarbs + totalKcal;
+                if (total === 0) {
+                    document.querySelectorAll(".macro-segment").forEach(seg => seg.style.width = "0%");
+                    document.getElementById("macroInfoText").textContent = "";
+                    return;
+                }
+
+                const fatPct = (totalFat / total) * 100;
+                const proteinPct = (totalProtein / total) * 100;
+                const carbsPct = (totalCarbs / total) * 100;
+                const kcalPct = (totalKcal / total) * 100;
+
+                const fatEl = document.querySelector(".macro-segment.fat");
+                const protEl = document.querySelector(".macro-segment.protein");
+                const carbEl = document.querySelector(".macro-segment.carbs");
+                const kcalEl = document.querySelector(".macro-segment.kcal");
+
+                fatEl.style.width = fatPct + "%";
+                protEl.style.width = proteinPct + "%";
+                carbEl.style.width = carbsPct + "%";
+                kcalEl.style.width = kcalPct + "%";
+
+                fatEl.setAttribute("data-label", `Fett: ${fatPct.toFixed(1)}%`);
+                protEl.setAttribute("data-label", `Protein: ${proteinPct.toFixed(1)}%`);
+                carbEl.setAttribute("data-label", `Kohlenhydrate: ${carbsPct.toFixed(1)}%`);
+                kcalEl.setAttribute("data-label", `Kalorien: ${kcalPct.toFixed(1)}%`);
+
+                document.getElementById("macroInfoText").textContent =
+                    `Gesamt: ${totalFat.toFixed(1)}g Fett | ${totalProtein.toFixed(1)}g Protein | ${totalCarbs.toFixed(1)}g Kohlenhydrate | ${totalKcal} kcal`;
+            }
+
+            function recalcCalories() {
+                kalorienRN = 0
+                entryList.querySelectorAll("p").forEach(entry => {
+                    const match = entry.textContent.match(/Kalorien: (\d+)/)
+                    if (match) {
+                        kalorienRN += parseInt(match[1])
+                    }
+                })
+
+                updateOutput()
+            }
+
+            inputField.addEventListener("input", function () {
+                kalorienziel = inputField.value
+            })
+
+            submitButton.addEventListener("click", function () {
+                if (kalorienziel < 100) {
+                    kalorienziel = 100
+                }
+                updateOutput()
+                inputField.value = ""
+            })
+
+            function updateEntryCount() {
+                const count = entryList.querySelectorAll("p").length
+                if (count === 1) {
+                    entryCountText.textContent = `Du hast heute ${count} Eintrag eingetragen.`
+                } else {
+                    entryCountText.textContent = `Du hast heute ${count} Einträge eingetragen.`
+                }
+            }
+
+            function ensureButtons(p) {
+                const existingGroup = p.querySelector(".entry-buttons");
+                if (existingGroup) existingGroup.remove();
+                const existingExpand = p.querySelector(".expand-btn");
+                if (existingExpand) existingExpand.remove();
+                const existingDetails = p.querySelector(".macro-details");
+                if (existingDetails) existingDetails.remove();
+                const existingNote = p.querySelector(".macro-none-note");
+                if (existingNote) existingNote.remove();
+
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "🖊️";
+                editBtn.classList.add("edit-btn");
+                editBtn.style.marginLeft = "10px";
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "❌";
+                deleteBtn.classList.add("delete-btn");
+                deleteBtn.style.marginLeft = "10px";
+
+                const buttonGroup = document.createElement("span");
+                buttonGroup.classList.add("entry-buttons");
+                buttonGroup.appendChild(editBtn);
+                buttonGroup.appendChild(deleteBtn);
+
+                const fat = (p.dataset.fat || "").toString().trim();
+                const protein = (p.dataset.protein || "").toString().trim();
+                const carbs = (p.dataset.carbs || "").toString().trim();
+
+                const hasMacro = [fat, protein, carbs].some(v => v !== "" && v !== "null" && v !== "undefined");
+
+                if (hasMacro) {
+                    const expandBtn = document.createElement("button");
+                    expandBtn.classList.add("expand-btn");
+                    expandBtn.type = "button";
+                    expandBtn.title = "Details anzeigen";
+                    expandBtn.style.display = "inline-flex";
+                    expandBtn.style.alignItems = "center";
+                    expandBtn.style.justifyContent = "center";
+                    expandBtn.style.width = "34px";
+                    expandBtn.style.height = "34px";
+                    expandBtn.style.borderRadius = "8px";
+                    expandBtn.style.border = "2px solid rgba(0,0,0,0.12)";
+                    expandBtn.style.background = "rgba(255,255,255,0.95)";
+                    expandBtn.style.cursor = "pointer";
+                    expandBtn.style.marginLeft = "10px";
+                    expandBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)";
+
+                    expandBtn.textContent = "🔽";
+                    expandBtn.style.fontSize = "16px";
+
+                    const details = document.createElement("div");
+                    details.classList.add("macro-details");
+                    details.style.display = "none";
+                    details.style.marginTop = "8px";
+                    details.style.padding = "0.6rem";
+                    details.style.borderRadius = "8px";
+                    details.style.background = "rgba(255,255,255,0.92)";
+                    details.style.boxShadow = "0 6px 18px rgba(0,0,0,0.06)";
+                    details.style.border = "1px solid rgba(0,0,0,0.06)";
+                    details.style.fontSize = "0.95rem";
+                    details.style.lineHeight = "1.3";
+                    details.style.width = "100%";
+
+                    const protText = protein !== "" ? `${protein} g` : "Keine Angabe";
+                    const fatText = fat !== "" ? `${fat} g` : "Keine Angabe";
+                    const carbsText = carbs !== "" ? `${carbs} g` : "Keine Angabe";
+
+                    details.innerHTML = `
+                        <div><strong>Protein:</strong> ${protText}</div>
+                        <div><strong>Fett:</strong> ${fatText}</div>
+                        <div><strong>Kohlenhydrate:</strong> ${carbsText}</div>
+                    `;
+
+                    expandBtn.addEventListener("click", function (e) {
+                        e.stopPropagation();
+                        const svg = expandBtn.querySelector("svg");
+                        if (details.style.display === "none") {
+                            details.style.display = "block";
+                            expandBtn.textContent = "🔼";
+                            expandBtn.title = "Details verbergen";
+                        } else {
+                            details.style.display = "none";
+                            expandBtn.textContent = "🔽";
+                            expandBtn.title = "Details anzeigen";
+                        }
+                    });
+
+                    p.appendChild(buttonGroup);
+                    p.appendChild(expandBtn);
+                    p.appendChild(details);
+                } else {
+                    p.appendChild(buttonGroup);
+                    const note = document.createElement("span");
+                    note.classList.add("macro-none-note");
+                    note.style.marginLeft = "10px";
+                    note.style.opacity = "0.75";
+                    note.style.fontSize = "0.95rem";
+                    note.textContent = "";
+                    p.appendChild(note);
+                }
+            }
+
+            function setupEnterNavigation(inputs, submitButton) {
+                inputs.forEach((el, idx) => {
+                    if (!el) return;
+                    el.addEventListener("keydown", function (e) {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            const next = inputs[idx + 1];
+                            if (next) {
+                                next.focus();
+                                if (next.select) next.select();
+                            } else if (submitButton && typeof submitButton.click === "function") {
+                                submitButton.click();
+                            }
+                        }
+                    });
+                });
+            }
+
+            function sortEntries() {
+                const allPs = Array.from(entryList.querySelectorAll("p"))
+                const sortBy = sortSelect.value
+                const dir = sortDirection === "asc" ? 1 : -1
+
+                function getName(el) {
+                    return (el.textContent.match(/Speise: ([^|]+)/) || ["", ""])[1].trim().toLowerCase()
+                }
+                function getCalories(el) {
+                    return parseInt((el.textContent.match(/Kalorien: (\d+)/) || ["", "0"])[1]) || 0
+                }
+                function getAmount(el) {
+                    return parseInt((el.textContent.match(/Menge: (\d+)/) || ["", "0"])[1]) || 0
+                }
+                function getTimestamp(el) {
+                    return parseInt(el.dataset.timestamp) || 0
+                }
+
+                allPs.sort(function (a, b) {
+                    if (sortBy === "date") {
+                        return (getTimestamp(a) - getTimestamp(b)) * dir
+                    }
+                    if (sortBy === "name") {
+                        return getName(a).localeCompare(getName(b)) * dir
+                    }
+                    if (sortBy === "calories") {
+                        return (getCalories(a) - getCalories(b)) * dir
+                    }
+                    if (sortBy === "amount") {
+                        const diff = (getAmount(a) - getAmount(b))
+                        if (diff === 0) return (getCalories(a) - getCalories(b)) * dir
+                        return diff * dir
+                    }
+                    return 0
+                })
+
+                const categories = ["Frühstück", "Mittagessen", "Abendessen", "Snack"]
+
+                entryList.innerHTML = ""
+
+                if (groupByCategoryCheckbox && groupByCategoryCheckbox.checked) {
+                    categories.forEach(cat => {
+                        const header = document.createElement("div")
+                        header.classList.add("category-header")
+                        header.style.cursor = "pointer"
+                        header.style.fontWeight = "700"
+                        header.style.margin = "0.6rem 0 0.2rem 0"
+                        header.style.padding = "0.35rem 0.6rem"
+                        header.style.border = "2px solid #000"
+                        header.style.borderRadius = "8px"
+                        header.style.background = "#f9e98c"
+                        header.textContent = cat + " ▾"
+
+                        const container = document.createElement("div")
+                        container.classList.add("category-container")
+                        container.style.display = "block"
+                        container.style.marginBottom = "0.6rem"
+
+                        const entriesForCat = allPs.filter(p => (p.dataset.category || "").toString() === cat)
+                        entriesForCat.forEach(origP => {
+                            const p = origP.cloneNode(true)
+                            p.dataset.category = origP.dataset.category || ""
+                            p.dataset.timestamp = origP.dataset.timestamp || origP.dataset.timestamp === 0 ? origP.dataset.timestamp : Date.now()
+
+                            ensureButtons(p)
+
+                            attachEntryEvents(p)
+
+                            container.appendChild(p)
+                        })
+
+                        if (entriesForCat.length === 0) {
+                            const emptyNote = document.createElement("div")
+                            emptyNote.textContent = "Keine Einträge"
+                            emptyNote.style.opacity = "0.6"
+                            emptyNote.style.padding = "0.4rem 0.6rem"
+                            container.appendChild(emptyNote)
+                        }
+
+                        header.addEventListener("click", function () {
+                            if (container.style.display === "none") {
+                                container.style.display = "block"
+                                header.textContent = cat + " ▾"
+                            } else {
+                                container.style.display = "none"
+                                header.textContent = cat + " ▸"
+                            }
+                        })
+
+                        entryList.appendChild(header)
+                        entryList.appendChild(container)
+                    })
+                } else {
+                    allPs.forEach(origP => {
+                        const p = origP.cloneNode(true)
+                        p.dataset.category = origP.dataset.category || ""
+                        p.dataset.timestamp = origP.dataset.timestamp || origP.dataset.timestamp === 0 ? origP.dataset.timestamp : Date.now()
+
+                        ensureButtons(p)
+                        attachEntryEvents(p)
+                        entryList.appendChild(p)
+                    })
+                }
+            }
+
+        </script>
+
+
+        <hr>
+
+        <h2>Trage nun deine Kalorien ein: </h2>
+        <div id="tools">
+            <button id="addEntryBtn">➕</button>
+
+            <!-- Kalender Buttons -->
+            <button id="prevDayBtn" title="Vorheriger Tag" style="display:none;">«</button>
+            <button id="calendarBtn" title="Datum wählen"></button>
+            <button id="nextDayBtn" title="Nächster Tag" style="display:none;">»</button>
+
+            <button id="purgeBtn" title="Mehrfach-Löschen aktivieren">🧹</button>
+
+            <span id="purgeControls" style="display:none; margin-left:10px;">
+                <button id="cancelPurgeBtn">🔙</button>
+                <button id="selectAllBtn">Alle auswählen</button>
+            </span>
+        </div>
+
+        <h3 id="entryCountText">Du hast heute 0 Einträge eingetragen.</h3>
+
+        <div id="sortSection">
+            <label for="sortSelect">Sortieren nach: </label>
+            <select id="sortSelect">
+                <option value="date">Zuletzt hinzugefügt</option>
+                <option value="name">Name (A–Z)</option>
+                <option value="calories">Kalorien</option>
+                <option value="amount">Menge</option>
+            </select>
+            <button id="sortDirectionBtn" title="Sortierrichtung ändern">⬇️</button>
+            <label style="display:flex; align-items: center; gap:6px;">
+                <input type="checkbox" id="groupByCategory" /> Nach Kategorien gruppieren
+            </label>
+        </div>
+
+        <div id="entries"></div>
+        <div id="entryList"></div>
+
+        <script>
+            const addEntryBtn = document.getElementById("addEntryBtn")
+            const entriesDiv = document.getElementById("entries")
+            const entryList = document.getElementById("entryList")
+            const entryCountText = document.getElementById("entryCountText")
+            const sortSelect = document.getElementById("sortSelect")
+            const sortDirectionBtn = document.getElementById("sortDirectionBtn")
+            const groupByCategoryCheckbox = document.getElementById("groupByCategory")
+            const purgeBtn = document.getElementById("purgeBtn")
+            const purgeControls = document.getElementById("purgeControls")
+            const selectAllBtn = document.getElementById("selectAllBtn")
+            const cancelPurgeBtn = document.getElementById("cancelPurgeBtn")
+            const calendarBtn = document.getElementById("calendarBtn")
+            const prevDayBtn = document.getElementById("prevDayBtn")
+            const nextDayBtn = document.getElementById("nextDayBtn")
+
+            let purgeMode = false
+            let sortDirection = "desc"
+            let isEntryActive = false
+
+            groupByCategoryCheckbox.addEventListener("change", function () {
+                sortEntries()
+            })
+
+            function loadEntriesForDate(date) {
+                const key = "entries_" + getDateKey(date);
+                const saved = localStorage.getItem(key);
+
+                if (saved) {
+                    entryList.innerHTML = saved;
+
+                    entryList.querySelectorAll("p").forEach(entry => {
+                        const text = entry.textContent.trim();
+                        if (
+                            text === "" ||
+                            text === "undefined" ||
+                            !text.includes("Speise:")
+                        ) {
+                            entry.remove();
+                        }
+                    });
+
+                    entryList.querySelectorAll("p").forEach(entry => attachEntryEvents(entry));
+                } else {
+                    entryList.innerHTML = "";
+                }
+
+                recalcCalories();
+                updateOutput();
+                updateEntryCount();
+                sortEntries();
+            }
+
+            function saveEntriesForDate(date) {
+                const key = "entries_" + getDateKey(date)
+                const pList = Array.from(entryList.querySelectorAll("p"))
+                const html = pList.map(p => p.outerHTML).join("")
+                localStorage.setItem(key, html)
+            }
+
+            function attachEntryEvents(entry) {
+                const editBtn = entry.querySelector(".edit-btn")
+                const deleteBtn = entry.querySelector(".delete-btn")
+                const oldCategory = entry.dataset.category || (entry.textContent.match(/Kategorie: ([^|]+)/) || ["", "Snack"])[1].trim()
+
+                if (deleteBtn) {
+                    deleteBtn.onclick = function () {
+                        entry.remove()
+                        recalcCalories()
+                        updateOutput()
+                        updateEntryCount()
+                        saveEntriesForDate(selectedDate)
+                    }
+                }
+
+                if (editBtn) {
+                    editBtn.onclick = function () {
+                        const oldName = (entry.textContent.match(/Speise: ([^|]+)/) || ["", ""])[1].trim();
+                        const oldCal = parseInt((entry.textContent.match(/Kalorien: (\d+)/) || ["", "0"])[1]);
+                        const oldAmount = parseInt((entry.textContent.match(/Menge: (\d+)/) || ["", "1"])[1]);
+                        const oldTime = (entry.textContent.match(/🕓 (\d{2}:\d{2})/) || ["", (new Date()).toTimeString().slice(0,5)])[1];
+                        const oldCategory = entry.dataset.category || "Snack";
+                        const oldFat = entry.dataset.fat || "";
+                        const oldProtein = entry.dataset.protein || "";
+                        const oldCarbs = entry.dataset.carbs || "";
+
+                        const editDiv = document.createElement("div");
+
+                        const tabsHeader = document.createElement("div");
+                        tabsHeader.style.display = "flex";
+                        tabsHeader.style.gap = "8px";
+                        tabsHeader.style.marginBottom = "6px";
+
+                        const tabAllgBtn = document.createElement("button");
+                        tabAllgBtn.type = "button";
+                        tabAllgBtn.textContent = "Allgemein";
+                        tabAllgBtn.classList.add("tab-btn", "active");
+
+                        const tabMakrosBtn = document.createElement("button");
+                        tabMakrosBtn.type = "button";
+                        tabMakrosBtn.textContent = "Makros";
+                        tabMakrosBtn.classList.add("tab-btn");
+
+                        tabsHeader.append(tabAllgBtn, tabMakrosBtn);
+
+                        const allgContent = document.createElement("div");
+                        allgContent.style.display = "block";
+
+                        const editNameLabel = document.createElement("label"); editNameLabel.textContent = "Speise: ";
+                        const editNameInput = document.createElement("input"); editNameInput.type = "text"; editNameInput.value = oldName;
+
+                        const editCalLabel = document.createElement("label"); editCalLabel.textContent = " Kalorien: ";
+                        const editCalInput = document.createElement("input"); editCalInput.type = "number"; editCalInput.value = oldCal;
+
+                        const editAmountLabel = document.createElement("label"); editAmountLabel.textContent = " Menge: ";
+                        const editAmountInput = document.createElement("input"); editAmountInput.type = "number"; editAmountInput.value = oldAmount;
+
+                        const editTimeLabel = document.createElement("label"); editTimeLabel.textContent = " Uhrzeit: ";
+                        const editTimeInput = document.createElement("input"); editTimeInput.type = "time"; editTimeInput.value = oldTime;
+
+                        const editCategoryLabel = document.createElement("label"); editCategoryLabel.textContent = " Kategorie: ";
+                        const editCategorySelect = document.createElement("select");
+                        editCategorySelect.innerHTML = `
+                            <option value="Frühstück">Frühstück</option>
+                            <option value="Mittagessen">Mittagessen</option>
+                            <option value="Abendessen">Abendessen</option>
+                            <option value="Snack">Snack</option>
+                        `;
+                        editCategorySelect.value = oldCategory;
+
+                        allgContent.append(editNameLabel, editNameInput, editCalLabel, editCalInput, editAmountLabel, editAmountInput, editTimeLabel, editTimeInput, editCategoryLabel, editCategorySelect);
+
+                        const makrosContent = document.createElement("div");
+                        makrosContent.style.display = "none";
+
+                        const editFatLabel = document.createElement("label"); editFatLabel.textContent = " Fett (g): ";
+                        const editFatInput = document.createElement("input"); editFatInput.type = "number"; editFatInput.min = 0; editFatInput.value = oldFat;
+
+                        const editProteinLabel = document.createElement("label"); editProteinLabel.textContent = " Protein (g): ";
+                        const editProteinInput = document.createElement("input"); editProteinInput.type = "number"; editProteinInput.min = 0; editProteinInput.value = oldProtein;
+
+                        const editCarbsLabel = document.createElement("label"); editCarbsLabel.textContent = " Kohlenhydrate (g): ";
+                        const editCarbsInput = document.createElement("input"); editCarbsInput.type = "number"; editCarbsInput.min = 0; editCarbsInput.value = oldCarbs;
+
+                        makrosContent.append(editFatLabel, editFatInput, editProteinLabel, editProteinInput, editCarbsLabel, editCarbsInput);
+
+                        tabAllgBtn.addEventListener("click", function () {
+                            tabAllgBtn.classList.add("active");
+                            tabMakrosBtn.classList.remove("active");
+                            allgContent.style.display = "block";
+                            makrosContent.style.display = "none";
+                        });
+                        tabMakrosBtn.addEventListener("click", function () {
+                            tabMakrosBtn.classList.add("active");
+                            tabAllgBtn.classList.remove("active");
+                            makrosContent.style.display = "block";
+                            allgContent.style.display = "none";
+                        });
+
+                        const saveBtn = document.createElement("button");
+                        saveBtn.textContent = "💾";
+
+                        const cancelBtn = document.createElement("button");
+                        cancelBtn.textContent = "🔙";
+                        cancelBtn.style.marginLeft = "10px";
+
+                        setupEnterNavigation([editNameInput, editCalInput, editAmountInput, editTimeInput, editCategorySelect], saveBtn);
+
+                        saveBtn.onclick = function () {
+                            const newName = editNameInput.value.trim();
+                            const newCal = parseInt(editCalInput.value);
+                            const newAmount = parseInt(editAmountInput.value) || 1;
+                            const newTime = editTimeInput.value;
+                            const newCategory = editCategorySelect.value;
+                            const newFat = editFatInput.value || "";
+                            const newProtein = editProteinInput.value || "";
+                            const newCarbs = editCarbsInput.value || "";
+
+                            if (!newName || isNaN(newCal) || isNaN(newAmount) || !newTime) {
+                                showNotification("Bitte gültige Werte eingeben!");
+                                return;
+                            }
+
+                            const newTotal = newCal * newAmount;
+
+                            const newEntry = document.createElement("p");
+                            newEntry.dataset.timestamp = Date.now();
+                            newEntry.dataset.category = newCategory;
+                            newEntry.dataset.fat = newFat;
+                            newEntry.dataset.protein = newProtein;
+                            newEntry.dataset.carbs = newCarbs;
+
+                            newEntry.textContent =
+                                newAmount > 1
+                                    ? `Speise: ${newName} | Kalorien: ${newTotal} (${newCal}) | Menge: ${newAmount} | 🕓 ${newTime} | Kategorie: ${newCategory}`
+                                    : `Speise: ${newName} | Kalorien: ${newTotal} | Menge: ${newAmount} | 🕓 ${newTime} | Kategorie: ${newCategory}`;
+
+                            ensureButtons(newEntry);
+
+                            editDiv.replaceWith(newEntry);
+                            attachEntryEvents(newEntry);
+                            saveEntriesForDate(selectedDate);
+                            recalcCalories();
+                            updateOutput();
+                            updateEntryCount();
+                            sortEntries();
+
+                            isEntryActive = false;
+                        };
+
+                        cancelBtn.onclick = function () {
+                            editDiv.replaceWith(entry);
+                            isEntryActive = false;
+                        };
+
+                        editDiv.append(tabsHeader, allgContent, makrosContent, saveBtn, cancelBtn);
+                        entry.replaceWith(editDiv);
+                        isEntryActive = true;
+                        editNameInput.focus();
+                    };
+                }
+            }
+
+            if (entryList) { }
+            entryList.querySelectorAll("p").forEach(entry => attachEntryEvents(entry))
+
+            isEntryActive = false
+
+            updateOutput()
+            updateEntryCount()
+
+            document.addEventListener("keydown", function(e) {
+                if (e.key === "+") {
+                    e.preventDefault()
+                    if (!isEntryActive && !purgeMode) {
+                        addEntryBtn.click()
+                        return
+                    }
+                    if (isEntryActive) {
+                        const submit = entriesDiv.querySelector(".submit-entry-btn")
+                        if (submit) {
+                            submit.click()
+                        } else {
+                            const fallback = Array.from(entriesDiv.querySelectorAll("button")).find(b => b.textContent && b.textContent.trim().toLowerCase().includes("hinzufügen"))
+                            if (fallback) fallback.click()
+                        }
+                    }
+                }
+            })
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && isEntryActive) {
+                    const activeEntry = entriesDiv.querySelector("div")
+                    if (activeEntry) {
+                        entriesDiv.removeChild(activeEntry)
+                        isEntryActive = false
+                    }
+                }
+            })
+
+            sortSelect.addEventListener("change", function () {
+                if (sortSelect.value === "name") {
+                    sortDirection = "asc"
+                }
+                if (sortSelect.value === "calories") {
+                    sortDirection = "desc"
+                }
+                if (sortSelect.value === "date") {
+                    sortDirection = "desc"
+                }
+                if (sortSelect.value === "amount") {
+                    sortDirection = "desc"
+                }
+                sortDirectionBtn.textContent = sortDirection === "asc" ? "⬆️" : "⬇️"
+                sortEntries()
+            })
+
+            sortDirectionBtn.addEventListener("click", function () {
+                if (sortDirection === "asc") {
+                    sortDirection = "desc"
+                } else {
+                    sortDirection = "asc"
+                }
+                sortDirectionBtn.textContent = sortDirection === "asc" ? "⬆️" : "⬇️"
+                sortEntries()
+            })
+
+            let calendarOpen = false
+
+            calendarBtn.textContent = formatDisplayDate(selectedDate)
+
+            calendarBtn.addEventListener("click", function () {
+                calendarOpen = !calendarOpen
+                if (calendarOpen) {
+                    prevDayBtn.style.display = "inline-block"
+                    nextDayBtn.style.display = "inline-block"
+
+                    calendarBtn.textContent = formatDisplayDate(selectedDate)
+                    loadEntriesForDate(selectedDate)
+                } else {
+                    prevDayBtn.style.display = "none"
+                    nextDayBtn.style.display = "none"
+
+                    selectedDate = new Date(currentDate)
+                    calendarBtn.textContent = "📅"
+                    loadEntriesForDate(selectedDate)
+                }
+            })
+
+            prevDayBtn.addEventListener("click", function () {
+                saveEntriesForDate(selectedDate)
+                selectedDate.setDate(selectedDate.getDate() - 1)
+                calendarBtn.textContent = formatDisplayDate(selectedDate)
+                loadEntriesForDate(selectedDate)
+            })
+
+            nextDayBtn.addEventListener("click", function () {
+                saveEntriesForDate(selectedDate)
+                selectedDate.setDate(selectedDate.getDate() + 1)
+                calendarBtn.textContent = formatDisplayDate(selectedDate)
+                loadEntriesForDate(selectedDate)
+            })
+
+
+            purgeBtn.addEventListener("click", function () {
+                if (purgeMode) {
+                    const checkboxes = document.querySelectorAll(".purge-checkbox:checked")
+
+                    if (purgeBtn.dataset.confirm === "true") {
+                        if (checkboxes.length > 0) {
+                            checkboxes.forEach(cb => {
+                                const entry = cb.closest("p")
+                                entry.remove()
+                            })
+                            // 🔹 Hier unbedingt die Änderungen speichern
+                            saveEntriesForDate(selectedDate)
+                            recalcCalories()
+                            updateOutput()
+                            updateEntryCount()
+                        }
+                        endPurgeMode()
+                        return
+                    }
+
+                    if (checkboxes.length > 0) {
+                        purgeBtn.textContent = "🧹 Löschen bestätigen?"
+                        purgeBtn.dataset.confirm = "true"
+                        return
+                    } else {
+                        endPurgeMode()
+                        return
+                    }
+                }
+
+                purgeMode = true
+                purgeBtn.dataset.confirm = "false"
+                purgeBtn.textContent = "🧹"
+                purgeControls.style.display = "inline-block"
+                selectAllBtn.textContent = "Alle auswählen"
+
+                const entries = entryList.querySelectorAll("p")
+                entries.forEach(entry => {
+                    if (!entry.querySelector(".purge-checkbox")) {
+                        const checkbox = document.createElement("input")
+                        checkbox.type = "checkbox"
+                        checkbox.classList.add("purge-checkbox")
+                        checkbox.style.marginRight = "8px"
+                        entry.prepend(checkbox)
+                    }
+                })
+            })
+
+            selectAllBtn.addEventListener("click", function () {
+                const checkboxes = document.querySelectorAll(".purge-checkbox")
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked)
+                checkboxes.forEach(cb => cb.checked = !allChecked)
+                selectAllBtn.textContent = allChecked ? "Alle auswählen" : "Nicht mehr auswählen"
+            })
+
+            cancelPurgeBtn.addEventListener("click", function () {
+                endPurgeMode()
+            })
+
+            function endPurgeMode() {
+                purgeMode = false
+                purgeBtn.textContent = "🧹"
+                purgeBtn.dataset.confirm = "false"
+                purgeControls.style.display = "none"
+                selectAllBtn.textContent = "Alle auswählen"
+                const checkboxes = document.querySelectorAll(".purge-checkbox")
+                checkboxes.forEach(cb => cb.remove())
+            }
+
+            addEntryBtn.addEventListener("click", function () {
+                if (isEntryActive) {
+                    showNotification("Bitte beende zuerst deinen aktuellen Eintrag!");
+                    return;
+                }
+                isEntryActive = true;
+
+                const entryDiv = document.createElement("div");
+
+                const tabsHeader = document.createElement("div");
+                tabsHeader.style.display = "flex";
+                tabsHeader.style.gap = "8px";
+                tabsHeader.style.marginBottom = "6px";
+
+                const tabAllgBtn = document.createElement("button");
+                tabAllgBtn.type = "button";
+                tabAllgBtn.textContent = "Allgemein";
+                tabAllgBtn.classList.add("tab-btn", "active");
+
+                const tabMakrosBtn = document.createElement("button");
+                tabMakrosBtn.type = "button";
+                tabMakrosBtn.textContent = "Makros";
+                tabMakrosBtn.classList.add("tab-btn");
+
+                tabsHeader.append(tabAllgBtn, tabMakrosBtn);
+
+                const allgContent = document.createElement("div");
+                allgContent.classList.add("tab-content", "active");
+                allgContent.style.display = "block";
+                allgContent.style.width = "100%";
+
+                const makrosContent = document.createElement("div");
+                makrosContent.classList.add("tab-content");
+                makrosContent.style.display = "none";
+                makrosContent.style.width = "100%";
+
+                const nameLabel = document.createElement("label"); nameLabel.textContent = "Speise: ";
+                const nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = "Name (z.B. Apfel)";
+
+                const calLabel = document.createElement("label"); calLabel.textContent = " Kalorien: ";
+                const calInput = document.createElement("input"); calInput.type = "number"; calInput.placeholder = "Kalorien (z.B. 114)";
+
+                const amountLabel = document.createElement("label"); amountLabel.textContent = " Menge: ";
+                const amountInput = document.createElement("input"); amountInput.type = "number"; amountInput.value = 1; amountInput.min = 0;
+
+                const timeLabel = document.createElement("label"); timeLabel.textContent = " Uhrzeit: ";
+                const timeInput = document.createElement("input"); timeInput.type = "time";
+                const now = new Date();
+                timeInput.value = now.toISOString().slice(11, 16);
+
+                const categoryLabel = document.createElement("label"); categoryLabel.textContent = " Kategorie: ";
+                const categorySelect = document.createElement("select");
+                categorySelect.innerHTML = `
+                    <option value="Frühstück">Frühstück</option>
+                    <option value="Mittagessen">Mittagessen</option>
+                    <option value="Abendessen">Abendessen</option>
+                    <option value="Snack">Snack</option>
+                `;
+                categorySelect.value = "Snack";
+
+                allgContent.append(
+                    nameLabel, nameInput,
+                    calLabel, calInput,
+                    amountLabel, amountInput,
+                    timeLabel, timeInput,
+                    categoryLabel, categorySelect
+                );
+
+                const fatLabel = document.createElement("label"); fatLabel.textContent = " Fett (g): ";
+                const fatInput = document.createElement("input"); fatInput.type = "number"; fatInput.min = 0; fatInput.placeholder = "z.B. 5";
+
+                const proteinLabel = document.createElement("label"); proteinLabel.textContent = " Protein (g): ";
+                const proteinInput = document.createElement("input"); proteinInput.type = "number"; proteinInput.min = 0; proteinInput.placeholder = "z.B. 12";
+
+                const carbsLabel = document.createElement("label"); carbsLabel.textContent = " Kohlenhydrate (g): ";
+                const carbsInput = document.createElement("input"); carbsInput.type = "number"; carbsInput.min = 0; carbsInput.placeholder = "z.B. 30";
+
+                setupProductAutocomplete(nameInput, calInput, fatInput, proteinInput, carbsInput);
+
+                makrosContent.append(fatLabel, fatInput, proteinLabel, proteinInput, carbsLabel, carbsInput);
+
+                tabAllgBtn.addEventListener("click", function () {
+                    tabAllgBtn.classList.add("active");
+                    tabMakrosBtn.classList.remove("active");
+                    allgContent.style.display = "block";
+                    makrosContent.style.display = "none";
+                });
+                tabMakrosBtn.addEventListener("click", function () {
+                    tabMakrosBtn.classList.add("active");
+                    tabAllgBtn.classList.remove("active");
+                    makrosContent.style.display = "block";
+                    allgContent.style.display = "none";
+                });
+
+                const submitEntryBtn = document.createElement("button");
+                submitEntryBtn.textContent = "Hinzufügen";
+                submitEntryBtn.classList.add("submit-entry-btn");
+
+                const cancelEntryBtn = document.createElement("button");
+                cancelEntryBtn.textContent = "🔙";
+                cancelEntryBtn.title = "Abbrechen";
+                cancelEntryBtn.style.marginLeft = "10px";
+
+                cancelEntryBtn.addEventListener("click", function () {
+                    entriesDiv.removeChild(entryDiv);
+                    isEntryActive = false;
+                });
+
+                setupEnterNavigation([nameInput, calInput, amountInput, timeInput, categorySelect], submitEntryBtn);
+
+                submitEntryBtn.addEventListener("click", function () {
+                    const name = nameInput.value.trim();
+                    const cal = parseInt(calInput.value);
+                    const amount = parseInt(amountInput.value);
+                    const time = timeInput.value;
+
+                    if (!name) { showNotification("Bitte gib einen Speisenamen ein!"); return; }
+                    if (isNaN(cal) || cal <= 0) { showNotification("Bitte gib gültige Kalorien an!"); calInput.focus(); return; }
+                    if (isNaN(amount) || amount <= 0) { showNotification("Bitte gib eine gültige Menge an!"); amountInput.focus(); return; }
+                    if (!time) { showNotification("Bitte wähle eine Uhrzeit aus!"); timeInput.focus(); return; }
+
+                    const totalCal = cal * amount;
+                    const category = categorySelect.value;
+                    const newEntry = document.createElement("p");
+                    newEntry.dataset.timestamp = Date.now();
+                    newEntry.dataset.category = category;
+                    newEntry.dataset.fat = fatInput.value || "";
+                    newEntry.dataset.protein = proteinInput.value || "";
+                    newEntry.dataset.carbs = carbsInput.value || "";
+
+                    const timeString = time;
+                    newEntry.textContent =
+                        amount > 1
+                            ? `Speise: ${name} | Kalorien: ${totalCal} (${cal}) | Menge: ${amount} | 🕓 ${timeString} | Kategorie: ${category}`
+                            : `Speise: ${name} | Kalorien: ${totalCal} | Menge: ${amount} | 🕓 ${timeString} | Kategorie: ${category}`;
+
+                    ensureButtons(newEntry);
+
+                    entryList.appendChild(newEntry);
+                    saveEntriesForDate(selectedDate);
+
+                    attachEntryEvents(newEntry);
+                    recalcCalories();
+                    updateOutput();
+                    updateEntryCount();
+                    sortEntries();
+
+                    entriesDiv.removeChild(entryDiv);
+                    isEntryActive = false;
+                });
+
+                entryDiv.append(tabsHeader, allgContent, makrosContent, submitEntryBtn, cancelEntryBtn);
+                entriesDiv.appendChild(entryDiv);
+                nameInput.focus();
+            });
+
+
+            sortDirectionBtn.textContent = sortDirection === "asc" ? "⬆️" : "⬇️"
+            sortEntries()
+
+            calendarBtn.textContent = "📅"
+            selectedDate = new Date()
+            loadEntriesForDate(selectedDate)
+
+            document.addEventListener("keydown", function (e) {
+            const el = e.target;
+            if (el.tagName === "INPUT" && el.type === "number") {
+                if (["e", "E", "+", "-"].includes(e.key)) {
+                e.preventDefault();
+                }
+            }
+            });
+
+            document.addEventListener("keydown", function (e) {
+            const el = e.target;
+
+            if (el.tagName === "INPUT" && e.key === "Enter") {
+                e.preventDefault();
+
+                const inputs = Array.from(document.querySelectorAll("input[type='text'], input[type='number']"))
+                .filter(inp => inp.offsetParent !== null);
+
+                const index = inputs.indexOf(el);
+
+                if (index > -1) {
+                    if (e.shiftKey && index > 0) {
+                        inputs[index - 1].focus();
+                    } else if (!e.shiftKey && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+            }
+            });
+
+        </script>
+
+        <div id="notificationContainer"
+            style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column-reverse; gap: 10px; z-index: 9999;">
+        </div>
+
+        <script>
+            function showNotification(message) {
+                const container = document.getElementById("notificationContainer")
+                const note = document.createElement("div")
+                note.classList.add("notification")
+                note.innerHTML = `
+                    <span>${message}</span>
+                    <button>❌</button>
+                `
+
+                note.querySelector("button").addEventListener("click", () => {
+                    hideNotification(note)
+                })
+
+                container.prepend(note)
+                requestAnimationFrame(() => note.classList.add("show"))
+
+                setTimeout(() => hideNotification(note), 3000)
+            }
+
+            function hideNotification(note) {
+                note.classList.remove("show")
+                note.style.opacity = "0"
+                note.style.transform = "translateX(120%)"
+                setTimeout(() => note.remove(), 500)
+            }
+
+        </script>
+
+        <script src="foodDatabase.js"></script>
+        <script>
+                function setupProductAutocomplete(inputEl, kcalEl, fatEl, protEl, carbEl) {
+                    const suggestionBox = document.createElement("div");
+                    suggestionBox.classList.add("suggestion-box");
+                    inputEl.parentNode.appendChild(suggestionBox);
+
+                    inputEl.addEventListener("input", () => {
+                        const val = inputEl.value.trim().toLowerCase();
+                        suggestionBox.innerHTML = "";
+
+                        if (val.length < 2) {
+                        suggestionBox.style.display = "none";
+                        suggestionBox.classList.remove("scrollable");
+                        return;
+                        }
+
+                        // Relevanz: indexOf (kleiner = besser), dann kürzere Namen bevorzugen
+                        const matches = productDatabase
+                        .map(p => ({ p, idx: p.name.toLowerCase().indexOf(val) }))
+                        .filter(x => x.idx >= 0)
+                        .sort((a, b) => {
+                            if (a.idx !== b.idx) return a.idx - b.idx; // Treffer früher im Namen zuerst
+                            // kürzerer Name besser
+                            const la = a.p.name.length, lb = b.p.name.length;
+                            if (la !== lb) return la - lb;
+                            return a.p.name.localeCompare(b.p.name);
+                        });
+
+                        if (matches.length === 0) {
+                        suggestionBox.style.display = "none";
+                        suggestionBox.classList.remove("scrollable");
+                        return;
+                        }
+
+                        // Nur die 4 wahrscheinlichsten anzeigen
+                        const top = matches.slice(0, 4).map(m => m.p);
+
+                        top.forEach(p => {
+                        const item = document.createElement("div");
+                        item.textContent = p.name;
+                        item.classList.add("suggestion-item");
+                        item.setAttribute("data-kcal", p.kcal);
+
+                        item.addEventListener("click", () => {
+                            inputEl.value = p.name;
+                            if (kcalEl) kcalEl.value = p.kcal;
+                            if (fatEl) fatEl.value = p.fat;
+                            if (protEl) protEl.value = p.protein;
+                            if (carbEl) carbEl.value = p.carbs;
+                            suggestionBox.style.display = "none";
+                            suggestionBox.classList.remove("scrollable");
+                        });
+
+                        suggestionBox.appendChild(item);
+                        });
+
+                        // Wenn mehr als 4 Treffer insgesamt, Box scrollbar / visuelle Hinweise
+                        if (matches.length > 4) {
+                        suggestionBox.classList.add("scrollable");
+                        } else {
+                        suggestionBox.classList.remove("scrollable");
+                        }
+
+                        suggestionBox.style.display = "block";
+                    });
+
+                    // Klick außerhalb schließt die Box
+                    document.addEventListener("click", e => {
+                        if (!suggestionBox.contains(e.target) && e.target !== inputEl) {
+                        suggestionBox.style.display = "none";
+                        suggestionBox.classList.remove("scrollable");
+                        }
+                    });
+
+                    // Optional: Pfeiltasten & Enter Navigation (einfaches Handling)
+                    let focusedIndex = -1;
+                    inputEl.addEventListener('keydown', (e) => {
+                        const items = Array.from(suggestionBox.querySelectorAll('.suggestion-item'));
+                        if (!items.length) return;
+                        if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        focusedIndex = Math.min(items.length - 1, focusedIndex + 1);
+                        items.forEach((it, i) => it.classList.toggle('focused', i === focusedIndex));
+                        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+                        } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        focusedIndex = Math.max(0, focusedIndex - 1);
+                        items.forEach((it, i) => it.classList.toggle('focused', i === focusedIndex));
+                        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+                        } else if (e.key === 'Enter') {
+                        if (focusedIndex >= 0 && items[focusedIndex]) {
+                            e.preventDefault();
+                            items[focusedIndex].click();
+                        }
+                        } else {
+                        focusedIndex = -1;
+                        }
+                    });
+                    }
+
+        </script>
+
+    </main>
+</body>
+</html>
