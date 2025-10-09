@@ -63,6 +63,7 @@ main {
   background-color: #f8e46a;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem; /* Abstand für mobile Ansicht */
 }
 
 #submitBtn:hover {
@@ -138,6 +139,7 @@ hr {
   padding: 0;
   background: transparent; /* Kein Kastenhintergrund */
   border: none; /* Keine Umrandung */
+  flex-wrap: wrap; /* Erlaubt Umbruch bei Platzmangel */
 }
 
 #tools button {
@@ -188,6 +190,7 @@ hr {
   align-items: center;
   gap: 0.8rem;
   font-size: 1.1rem;
+  flex-wrap: wrap; /* Erlaubt Umbruch bei Platzmangel */
 }
 
 /* Sortier-Select */
@@ -235,6 +238,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* Verhindert, dass die Checkbox schrumpft */
 }
 
 /* Hover-Effekt */
@@ -271,10 +275,9 @@ input[type="checkbox"]:checked::after {
   padding: 0.6rem 1rem;
   margin: 0.6rem 0;
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: nowrap;
-  justify-content: space-between;
+  flex-direction: column; /* Standard auf Spalte für mobile Geräte */
+  align-items: flex-start; /* Inhalt linksbündig */
+  gap: 0.8rem;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -283,6 +286,8 @@ input[type="checkbox"]:checked::after {
   align-items: center;
   gap: 0.4rem;
   margin-left: auto;
+  width: 100%; /* Volle Breite für Button-Container */
+  justify-content: flex-end; /* Buttons nach rechts */
 }
 
 .timestamp {
@@ -327,9 +332,9 @@ input[type="checkbox"]:checked::after {
   padding: 1rem;
   margin-top: 1rem;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
+  flex-direction: column; /* Alles untereinander anordnen */
+  align-items: stretch; /* Elemente auf volle Breite strecken */
+  gap: 0.8rem;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -342,6 +347,7 @@ input[type="checkbox"]:checked::after {
 #entries label,
 #entryList label {
   font-weight: 500;
+  margin-bottom: -0.4rem; /* Abstand zwischen Label und Input verringern */
 }
 
 #entries input,
@@ -350,8 +356,9 @@ input[type="checkbox"]:checked::after {
 #entryList select {
   border-radius: 10px;
   border: 2px solid #000;
-  padding: 0.3rem 0.6rem;
+  padding: 0.5rem 0.6rem; /* Bessere Klickfläche */
   font-size: 1rem;
+  width: 100%; /* Volle Breite nutzen */
 }
 
 /* Buttons im Formular */
@@ -362,8 +369,8 @@ input[type="checkbox"]:checked::after {
   background-color: #f9e98c;
   cursor: pointer;
   font-size: 1rem;
-  padding: 0.4rem 0.8rem;
-  margin-top: 0.2rem;
+  padding: 0.6rem 0.8rem; /* Größere Buttons */
+  margin-top: 0.5rem;
   font-weight: 600;
   transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
 }
@@ -443,11 +450,12 @@ input[type="checkbox"]:checked::after {
    ============================== */
 #notificationContainer {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 10px;
+  right: 10px;
+  left: 10px; /* Nimmt die Breite auf mobilen Geräten ein */
   display: flex;
   flex-direction: column-reverse;
-  align-items: flex-end;
+  align-items: center; /* Zentriert die Notifications */
   gap: 10px;
   z-index: 9999;
   pointer-events: none;
@@ -458,8 +466,8 @@ input[type="checkbox"]:checked::after {
   border: 2px solid #000;
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  min-width: 220px;
-  max-width: 300px;
+  width: 100%;
+  max-width: 320px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.25);
   font-weight: 600;
   color: #222;
@@ -468,7 +476,7 @@ input[type="checkbox"]:checked::after {
   align-items: center;
   gap: 0.8rem;
   opacity: 0;
-  transform: translateX(120%) translateY(20px);
+  transform: translateY(120%);
   pointer-events: auto;
   transition:
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -478,7 +486,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .notification.show {
-  transform: translateX(0) translateY(0);
+  transform: translateY(0);
   opacity: 1;
 }
 
@@ -518,6 +526,7 @@ input[type="checkbox"]:checked::after {
   background: transparent;
   border: none;
   padding-bottom: 0;
+  width: 100%; /* Volle Breite für den Tab-Header */
 }
 
 /* Basis-Design der Tabs */
@@ -539,11 +548,22 @@ input[type="checkbox"]:checked::after {
   position: relative;
   top: 3px;
   z-index: 1;
+  flex-grow: 1; /* Tabs teilen sich den verfügbaren Platz */
+  text-align: center;
 }
 
 .tab-btn:hover { background: linear-gradient(to bottom, #fffce0, #f7e88a); transform: translateY(-1px); }
 .tab-btn.active { background: linear-gradient(to bottom, #ffffff, #fff7b5); box-shadow: 0 -1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); z-index:3; top:0;}
 .tab-btn:not(.active) { opacity: 0.9; }
+
+/* Inhalte der Tabs (Allgemein / Makros) */
+#entries .tab-content, #entryList .tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+}
+
 
 /* ==============================
    🔁 Sortierrichtungs-Button
@@ -582,7 +602,6 @@ input[type="checkbox"]:checked::after {
 /* ==============================
    🍯 Autocomplete / Suggestion Box
    ============================== */
-/* Container-Styling: positioniert die Box relativ zum Input (input.parentNode sollte overflow: visible haben) */
 .suggestion-box {
   position: absolute;
   top: calc(100% + 6px);
@@ -595,21 +614,19 @@ input[type="checkbox"]:checked::after {
   border-radius: 0 0 14px 14px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
   z-index: 999999;
-  overflow-y: auto;                /* wichtig: scrollen erlauben */
+  overflow-y: auto;
   overflow-x: hidden;
-  /* Max-Höhe jetzt für exakt 4 sichtbare Items (Itemhöhe 48 + margin 12 => ~60px pro Item) */
-  max-height: 300px;               /* 4 * ~60 + padding = 256px */
+  max-height: 300px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: #000 #fffdf2;
   animation: fadeIn 0.18s ease-in-out;
   display: none;
-  padding: 8px;                    /* innenabstand, damit Items nicht an Kante kleben */
+  padding: 8px;
   box-sizing: border-box;
-  pointer-events: auto;            /* Interaktion erlauben */
+  pointer-events: auto;
 }
 
-/* WICHTIG: fixe Höhe + line-height sorgen für vertikale Zentrierung */
 .suggestion-box .suggestion-item {
   display: flex;
   align-items: center;
@@ -633,7 +650,6 @@ input[type="checkbox"]:checked::after {
   text-overflow: ellipsis;
 }
 
-/* kcal-Anzeige rechts, vertikal zentriert */
 .suggestion-box .suggestion-item::after {
   content: attr(data-kcal) " kcal";
   display: inline-block;
@@ -645,13 +661,11 @@ input[type="checkbox"]:checked::after {
   opacity: 0.95;
 }
 
-/* Hover */
 .suggestion-box .suggestion-item:hover {
   background: #fff6b8;
   transform: translateX(3px);
 }
 
-/* Fallbacks falls andere stronger selectors existieren */
 .suggestion-item {
   border: 2px solid #000 !important;
   border-radius: 10px;
@@ -672,24 +686,112 @@ input[type="checkbox"]:checked::after {
   transform: translateX(3px) !important;
 }
 
-/* Eingabefeld bekommt abgerundete obere Kanten, aber keine unteren */
-#entries input[name="name"],
-#entryList input[name="name"] {
+#entries input[type="text"],
+#entryList input[type="text"] {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-/* Container so, dass nichts abgeschnitten wird (wichtig!) */
 #entries div,
 #entryList div {
   position: relative;
   overflow: visible !important;
 }
 
-/* ==============================
-   Rest: kleine Hilfsanimationen
-   ============================== */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================================================================
+   📱 RESPONSIVE DESIGN - MEDIA QUERIES
+   =================================================================== */
+
+/* Für Tablets und kleinere Geräte (bis 768px) */
+@media (max-width: 768px) {
+  main {
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.3rem; }
+
+  /* Kalorienziel-Eingabe untereinander */
+  label[for="kalorienziel"] {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  #kalorienziel {
+    width: 100%;
+  }
+  #submitBtn {
+    width: 100%;
+    margin-top: 0.8rem;
+  }
+
+  /* Einträge: Text und Buttons nebeneinander */
+  #entryList p {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  #entryList p > span:first-of-type {
+      width: 100%;
+      margin-bottom: 0.5rem;
+  }
+
+  .entry-buttons {
+      width: auto; /* Breite anpassen */
+      margin-left: 0;
+  }
+
+  /* Editierformular: Inputs behalten die volle Breite */
+  #entries div, #entryList div {
+      padding: 0.8rem;
+  }
+}
+
+/* Für sehr kleine Bildschirme (Smartphones, bis 480px) */
+@media (max-width: 480px) {
+  body {
+    -webkit-text-size-adjust: 100%; /* Verhindert Auto-Zoom von Text auf iOS */
+  }
+
+  main {
+      padding: 0.8rem;
+  }
+
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.1rem; }
+
+  #sortSection {
+    flex-direction: column;
+    align-items: stretch; /* Elemente auf volle Breite strecken */
+    gap: 1rem;
+  }
+
+  #sortSelect, #sortDirectionBtn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Um den Text im Eintrag besser lesbar zu machen */
+  #entryList p {
+      font-size: 0.95rem;
+      padding: 0.8rem;
+      word-break: break-word; /* Lange Wörter umbrechen */
+  }
+
+  /* Editierformular: Kompaktere Ansicht */
+  #entries div, #entryList div {
+      gap: 0.6rem;
+  }
+  
+  .tab-btn {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+  }
 }
