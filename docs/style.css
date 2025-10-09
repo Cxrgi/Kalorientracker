@@ -1,0 +1,695 @@
+/* ==============================
+   🌼 Allgemeines Design
+   ============================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  background-color: #EBC620;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+/* ==============================
+   🌟 Sticky Header
+   ============================== */
+h1 {
+  font-size: 2.8rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 0.3rem;
+  font-weight: normal;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background-color: #EBC620;
+  text-align: center;
+  padding: 1rem 0 1.2rem 0;
+  border-bottom: 3px solid rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+/* ==============================
+   🌸 Hauptcontainer
+   ============================== */
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+}
+
+/* ==============================
+   🎯 Kalorienziel-Bereich
+   ============================== */
+#kalorienziel,
+#submitBtn {
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: 2px solid #000;
+  padding: 0.4rem 0.6rem;
+}
+
+#submitBtn {
+  background-color: #f8e46a;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#submitBtn:hover {
+  background-color: #f9e98c;
+  transform: translateY(-2px);
+}
+
+#submitBtn:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+}
+
+label {
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+/* ==============================
+   📊 Fortschrittsbalken
+   ============================== */
+#progressContainer {
+  width: 100%;
+  height: 20px;
+  background-color: white;
+  border: 2px solid #000;
+  border-radius: 20px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+#progressBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #ff4d4d, #ff944d);
+  border-radius: 20px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+/* ==============================
+   ⚠️ Warntext
+   ============================== */
+#warnText {
+  margin-top: 0.6rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+/* ==============================
+   📏 Linie
+   ============================== */
+hr {
+  border: none;
+  border-top: 2px solid rgba(0,0,0,0.2);
+  margin: 2rem 0;
+}
+
+/* ==============================
+   🧾 Kalorien-Eintrag Bereich
+   ============================== */
+#entries, #entryList {
+  margin-top: 1rem;
+}
+
+/* ==============================
+   🛠️ Tools-Leiste (Chrome-Tab-Stil)
+   ============================== */
+#tools {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0;
+  background: transparent; /* Kein Kastenhintergrund */
+  border: none; /* Keine Umrandung */
+}
+
+#tools button {
+  background-color: #f9e98c;
+  border: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: none;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #000;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.15s;
+  position: relative;
+  top: 2px;
+}
+
+/* Hover-Effekt – sanft angehoben */
+#tools button:hover {
+  background-color: #fef3b1;
+  transform: translateY(-3px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Klick-Effekt – leicht gedrückt */
+#tools button:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+}
+
+/* Aktiver Tab (z. B. aktuelle Auswahl) */
+#tools button.active {
+  background-color: #fff8c4;
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  z-index: 5;
+}
+
+/* ==============================
+   🧠 Sortieren-Bereich
+   ============================== */
+#sortSection {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.1rem;
+}
+
+/* Sortier-Select */
+#sortSelect {
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  border: 2px solid #000;
+  background-color: #f8e46a;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+#sortSelect:hover {
+  background-color: #f9e98c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+#sortSelect:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.12);
+}
+
+#sortSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.4), 0 0 0 6px rgba(0,0,0,0.15);
+}
+
+/* ==============================
+   ✅ Checkbox Styling – modern & zentriert
+   ============================== */
+input[type="checkbox"] {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  background-color: #f8e46a;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover-Effekt */
+input[type="checkbox"]:hover {
+  background-color: #f9e98c;
+  transform: scale(1.1);
+}
+
+/* Checked Zustand */
+input[type="checkbox"]:checked {
+  background-color: #ff944d;
+  border-color: #000;
+}
+
+/* Haken */
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  font-size: 1.2rem;
+  color: #000;
+  line-height: 0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==============================
+   🍏 Einträge
+   ============================== */
+#entryList p {
+  background-color: #e0c34d;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  margin: 0.6rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.entry-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.timestamp {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+#entryList p:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Buttons innerhalb der Einträge */
+#entryList p button {
+  border: 2px solid #000;
+  border-radius: 8px;
+  background-color: #f9e98c;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#entryList p button:hover {
+  background-color: #fef3b1;
+  transform: translateY(-2px);
+}
+
+#entryList p button:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+}
+
+/* ==============================
+   📝 Eintragsformular / Editierformular
+   ============================== */
+#entries div,
+#entryList div {
+  background-color: #fff8c4;
+  border: 2px solid #000;
+  border-radius: 15px;
+  padding: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#entries div:hover,
+#entryList div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+#entries label,
+#entryList label {
+  font-weight: 500;
+}
+
+#entries input,
+#entryList input,
+#entries select,
+#entryList select {
+  border-radius: 10px;
+  border: 2px solid #000;
+  padding: 0.3rem 0.6rem;
+  font-size: 1rem;
+}
+
+/* Buttons im Formular */
+#entries div button,
+#entryList div button {
+  border: 2px solid #000;
+  border-radius: 10px;
+  background-color: #f9e98c;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.4rem 0.8rem;
+  margin-top: 0.2rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+#entries div button:hover,
+#entryList div button:hover {
+  background-color: #fef3b1;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+#entries div button:active,
+#entryList div button:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+}
+
+/* Kategorie-Auswahl */
+#entries select,
+#entryList select {
+  background-color: #f8e46a;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#entries select:hover,
+#entryList select:hover {
+  background-color: #f9e98c;
+  transform: translateY(-2px);
+}
+
+#entries select:active,
+#entryList select:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+}
+
+/* 💬 Textanzeige */
+#outputText {
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* ==============================
+   🪷 Kalender-Datum Label
+   ============================== */
+#dateDisplay {
+  background-color: #f9e98c;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #000;
+  text-align: center;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.15s;
+}
+
+#dateDisplay:hover {
+  background-color: #fef3b1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+#dateDisplay:active {
+  background-color: #e0cc5c;
+  transform: translateY(1px);
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.12);
+}
+
+/* ==============================
+   📢 Notification Container
+   ============================== */
+#notificationContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.notification {
+  background: #fff8c4;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  min-width: 220px;
+  max-width: 300px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  font-weight: 600;
+  color: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  opacity: 0;
+  transform: translateX(120%) translateY(20px);
+  pointer-events: auto;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    margin 0.4s ease;
+  will-change: transform, opacity, margin;
+}
+
+.notification.show {
+  transform: translateX(0) translateY(0);
+  opacity: 1;
+}
+
+.notification button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.notification button:hover {
+  transform: scale(1.2);
+}
+
+.notification:nth-child(n+5) {
+  transform: scale(0.85);
+  opacity: 0.6;
+  margin-top: -12px;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.notification:nth-child(n+6) {
+  display: none;
+}
+
+/* ==============================
+   🧭 Chrome-ähnliche Tab-Leiste im Eintragsformular
+   ============================== */
+#entries div > div:first-child,
+#entryList div > div:first-child {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  margin-bottom: 0.8rem;
+  background: transparent;
+  border: none;
+  padding-bottom: 0;
+}
+
+/* Basis-Design der Tabs */
+.tab-btn {
+  appearance: none;
+  background: linear-gradient(to bottom, #fffdf4, #f2e293);
+  border: none;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 0.45rem 1.2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #222;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  top: 3px;
+  z-index: 1;
+}
+
+.tab-btn:hover { background: linear-gradient(to bottom, #fffce0, #f7e88a); transform: translateY(-1px); }
+.tab-btn.active { background: linear-gradient(to bottom, #ffffff, #fff7b5); box-shadow: 0 -1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); z-index:3; top:0;}
+.tab-btn:not(.active) { opacity: 0.9; }
+
+/* ==============================
+   🔁 Sortierrichtungs-Button
+   ============================== */
+#sortDirectionBtn {
+  background-color: #f8e46a;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 0.45rem 0.9rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+#sortDirectionBtn:hover { background-color: #f9e98c; transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
+#sortDirectionBtn:active { background-color: #e0cc5c; transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0,0,0,0.12); }
+
+/* ==============================
+   🧃 Makronährstoff-Verteilung
+   ============================== */
+#macroBarContainer { width: 100%; margin-top: 1.4rem; }
+#macroBar { width: 100%; height: 26px; border-radius: 14px; overflow: hidden; display: flex; border: 2px solid #000; background-color: #f5f5f5; position: relative; }
+.macro-segment { height: 100%; transition: width 0.5s ease; position: relative; cursor: pointer; }
+.macro-segment::after { content: attr(data-label); position: absolute; width: 100%; text-align: center; font-weight: 600; font-size: 0.9rem; color: #000; opacity: 0; transition: opacity 0.25s ease; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.macro-segment:hover::after { opacity: 1; }
+.fat { background-color: #FFD700; }
+.protein { background-color: #3B82F6; }
+.carbs { background-color: #4CAF50; }
+.kcal { background-color: #D3D3D3; }
+#macroInfoText { margin-top: 0.5rem; font-size: 0.95rem; font-weight: 600; text-align: center; }
+
+/* ==============================
+   🍯 Autocomplete / Suggestion Box
+   ============================== */
+/* Container-Styling: positioniert die Box relativ zum Input (input.parentNode sollte overflow: visible haben) */
+.suggestion-box {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-width: 480px;
+  background: #fffdf2;
+  border: 2px solid #000;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  z-index: 999999;
+  overflow-y: auto;                /* wichtig: scrollen erlauben */
+  overflow-x: hidden;
+  /* Max-Höhe jetzt für exakt 4 sichtbare Items (Itemhöhe 48 + margin 12 => ~60px pro Item) */
+  max-height: 300px;               /* 4 * ~60 + padding = 256px */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #000 #fffdf2;
+  animation: fadeIn 0.18s ease-in-out;
+  display: none;
+  padding: 8px;                    /* innenabstand, damit Items nicht an Kante kleben */
+  box-sizing: border-box;
+  pointer-events: auto;            /* Interaktion erlauben */
+}
+
+/* WICHTIG: fixe Höhe + line-height sorgen für vertikale Zentrierung */
+.suggestion-box .suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 0.9rem;
+  font-size: 1rem;
+  color: #222;
+  background: #fffdf2;
+  cursor: pointer;
+  border: 2px solid #000 !important;
+  border-radius: 10px;
+  margin: 6px 0;
+  transition: transform 0.12s ease, background 0.1s ease;
+  box-sizing: border-box;
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* kcal-Anzeige rechts, vertikal zentriert */
+.suggestion-box .suggestion-item::after {
+  content: attr(data-kcal) " kcal";
+  display: inline-block;
+  margin-left: auto;
+  line-height: 48px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  opacity: 0.95;
+}
+
+/* Hover */
+.suggestion-box .suggestion-item:hover {
+  background: #fff6b8;
+  transform: translateX(3px);
+}
+
+/* Fallbacks falls andere stronger selectors existieren */
+.suggestion-item {
+  border: 2px solid #000 !important;
+  border-radius: 10px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  font-weight: 700 !important;
+  padding: 0 0.9rem !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+.suggestion-item:hover {
+  background: #fff6b8 !important;
+  transform: translateX(3px) !important;
+}
+
+/* Eingabefeld bekommt abgerundete obere Kanten, aber keine unteren */
+#entries input[name="name"],
+#entryList input[name="name"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Container so, dass nichts abgeschnitten wird (wichtig!) */
+#entries div,
+#entryList div {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* ==============================
+   Rest: kleine Hilfsanimationen
+   ============================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
