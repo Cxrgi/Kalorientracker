@@ -1,20 +1,20 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Schlage ein Feature für die Website vor!
 title: Feature Request
 labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Ist deine Feature-Anfrage mit einem Problem verbunden? Bitte beschreibe es.**  
+Eine klare und kurze Beschreibung des Problems. Beispiel: Ich bin immer frustriert, wenn [...]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Beschreibe die gewünschte Lösung**  
+Eine klare und kurze Beschreibung dessen, was passieren soll.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Beschreibe alternative Ansätze, die du in Betracht gezogen hast**  
+Eine klare und kurze Beschreibung von alternativen Lösungen oder Funktionen, die du überlegt hast.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Zusätzlicher Kontext**  
+Füge hier weiteren Kontext oder Screenshots zur Feature-Anfrage hinzu.
