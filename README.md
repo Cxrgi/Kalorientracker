@@ -1,76 +1,77 @@
-# 🍎 Calorie Tracker
+# 🍎 Kalorientracker
 
-Welcome to the **Calorie Tracker Web App** — a personal nutrition assistant built to help you stay on top of your daily calorie goals.
-This project is continuously developed and will keep receiving updates, **even after my internship ends**.
-
----
-
-## 🌟 Features
-
-* **Add calories** for each meal
-* **Set daily calorie goals**
-* **Track meals** with names and calorie values
-* **Dynamic progress indicator** (green, yellow, red based on progress)
-* **Persistent storage** — all data is saved via `localStorage`, even after reloading the page
-* **Delete entries** and **discard drafts**
-* **Meal categories**: Breakfast, Lunch, Dinner, Snack
-* **Add macronutrients** (Carbs, Protein, Fat)
-* **Clear all entries for a day** (with confirmation prompt)
-* **Calendar view** — log data for each day individually
-* **Calorie warnings** when exceeding your daily target
-* **Duplicate entries** (e.g., copy yesterday’s meal to today)
-* **Sorting options** (Alphabetical, Category, Recently Added, Calories, Quantity)
-* **Display total entries per day**
-* **Edit existing entries**
-* **Keyboard shortcuts**:
-
-  * `+` → Quickly add a new entry
-  * `Esc` → Discard current draft
-* **Custom notification system**
-* **Secondary progress bar** showing calorie and macronutrient distribution
-* **Quick add button (“+”)** inside the entry form
-* **Search suggestions and auto-fill** via a local database
+Willkommen bei der **Kalorientracker Web-App** — dein persönlicher Ernährungsassistent, der dir hilft, deine täglichen Kalorienziele im Blick zu behalten.  
+Dieses Projekt wird kontinuierlich weiterentwickelt und erhält auch **nach dem Ende meines Praktikums** regelmäßig Updates.
 
 ---
 
-## 🚀 About
+## 🌟 Funktionen
 
-This web app runs entirely in the browser — no server, no account required.
-All user data is stored **locally** using the browser’s `localStorage`.
+* **Kalorien hinzufügen** für jede Mahlzeit  
+* **Tägliches Kalorienziel festlegen**  
+* **Mahlzeiten nach Namen und Kalorienwerten verfolgen**  
+* **Dynamischer Fortschrittsindikator** (grün, gelb, rot – je nach Fortschritt)  
+* **Dauerhafte Speicherung** — alle Daten werden über `localStorage` gespeichert, auch nach dem Neuladen der Seite  
+* **Einträge löschen** und **Entwürfe verwerfen**  
+* **Mahlzeitenkategorien**: Frühstück, Mittagessen, Abendessen, Snack  
+* **Makronährstoffe hinzufügen** (Kohlenhydrate, Eiweiß, Fett)  
+* **Alle Einträge eines Tages löschen** (mit Bestätigungsabfrage)  
+* **Kalenderansicht** — Daten können für jeden Tag einzeln eingetragen werden  
+* **Kalorienwarnungen**, wenn das tägliche Ziel überschritten wird  
+* **Einträge duplizieren** (z. B. Mahlzeit von gestern auf heute kopieren)  
+* **Sortieroptionen** (Alphabetisch, Kategorie, Zuletzt hinzugefügt, Kalorien, Menge)  
+* **Gesamtanzahl der Einträge pro Tag anzeigen**  
+* **Vorhandene Einträge bearbeiten**  
+* **Tastenkürzel**:
 
-I created this project during my internship as a practical way to learn about:
+  * `+` → Schnell einen neuen Eintrag hinzufügen  
+  * `Esc` → Aktuellen Entwurf verwerfen  
 
-* Web app design
-* Persistent data handling
-* UX/UI logic for real-world use cases
-
-Even though this project started as part of my internship, **I’ll continue improving and expanding it regularly** — new features, optimizations, and design improvements are coming soon!
-
----
-
-## 🐞 Reporting Bugs & Suggesting Features
-
-If you encounter any issues or have feature ideas, please **open an Issue** in this repository:
-
-1. Go to the **Issues** tab at the top of this page
-2. Click **“New issue”**
-3. Choose whether it’s a **Bug report** 🪲 or a **Feature suggestion** 💡
-4. Provide as much detail as possible — screenshots or steps to reproduce are very helpful!
-
-Your feedback is highly appreciated and helps make the Calorie Tracker even better.
-
----
-
-## 🧠 Tech Highlights
-
-* Pure **HTML, CSS, and JavaScript**
-* Powered by **localStorage** for offline persistence
-* No external backend or login required
-* Built and hosted with **GitHub Pages**
+* **Eigenes Benachrichtigungssystem**  
+* **Sekundäre Fortschrittsanzeige** für Kalorien- und Makronährstoffverteilung  
+* **Schnell-Hinzufügen-Button („+“)** im Eingabeformular  
+* **Suchvorschläge und Auto-Vervollständigung** über eine lokale Datenbank  
 
 ---
 
-## 📜 License
+## 🚀 Über das Projekt
+
+Diese Web-App läuft vollständig im Browser — kein Server, kein Account notwendig.  
+Alle Benutzerdaten werden **lokal** über den `localStorage` des Browsers gespeichert.
+
+Ich habe dieses Projekt während meines Praktikums erstellt, um praxisnah zu lernen:
+
+* Web-App-Design  
+* Umgang mit persistenten Daten  
+* UX/UI-Logik für reale Anwendungsfälle  
+
+Auch wenn das Projekt im Rahmen meines Praktikums begonnen hat, **werde ich es regelmäßig weiterentwickeln** — neue Features, Optimierungen und Designverbesserungen sind schon in Planung!
+
+---
+
+## 🐞 Fehler melden & Funktionen vorschlagen
+
+Wenn du auf ein Problem stößt oder Ideen für neue Funktionen hast, kannst du gerne ein **Issue** in diesem Repository erstellen:
+
+1. Gehe oben auf den Tab **“Issues”**  
+2. Klicke auf **“New issue”**  
+3. Wähle aus, ob es sich um einen **Bug-Report** 🪲 oder einen **Feature-Vorschlag** 💡 handelt  
+4. Beschreibe das Problem oder die Idee so genau wie möglich — Screenshots oder Schritte zum Reproduzieren sind super hilfreich!
+
+Dein Feedback ist sehr willkommen und hilft, den Kalorientracker immer weiter zu verbessern.
+
+---
+
+## 🧠 Technische Highlights
+
+* Reines **HTML, CSS und JavaScript**  
+* Nutzt **localStorage** für Offline-Speicherung  
+* Kein externes Backend oder Login nötig  
+* Entwickelt und gehostet mit **GitHub Pages**
+
+---
+
+## 📜 Lizenz
 
 Copyright (c) 2025 Leonard Janas. All rights reserved.
 
@@ -85,7 +86,7 @@ This restriction applies worldwide and indefinitely.
 
 ---
 
-Thanks for checking out this project!
-Feel free to explore, test, and share feedback — every idea helps improve the app.
+Danke, dass du dir dieses Projekt angeschaut hast!  
+Probier’s gerne aus, teste alles und gib Feedback — jede Idee hilft, die App weiter zu verbessern.
 
-**Stay healthy and keep tracking!** 🥗
+**Bleib gesund und behalt deine Ziele im Blick!** 🥗
